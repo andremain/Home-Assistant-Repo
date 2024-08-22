@@ -63,13 +63,6 @@ blueprint:
       selector:
         target:
 
-    include:
-      name: Included Entities
-      description: Entities (e.g. smartphone) to include from detection. Only entities and devices are supported, areas must be expanded!
-      default: {}
-      selector:
-        target:
-
     actions:
       name: Actions
       description: Notifications or similar to be run. {{entities}} is replaced with the names of unavailable entities.
@@ -88,8 +81,28 @@ variables:
 
   current_day: '{{ now().weekday() | int }}'
 
-  include: !input 'include'
   exclude: !input 'exclude'
+
+  entities: >-
+    {% set result = namespace(includedEntities=[], excludedEntities = []) %}
+
+    {% if exclude.entity_id is defined %} 
+        {% set result.excludedEntities = result.excludedEntities + ([exclude.entity_id] if exclude.entity_id is string else exclude.entity_id) %}
+    {% endif %}
+
+    {% if exclude.device_id is defined %}
+      {% for device_id in exclude.device_id %}
+        {% set result.excludedEntities = result.excludedEntities + device_entities(device_id) %}
+      {% endfor %}
+    {% endif %}
+
+    {% for state in states | selectattr('state', 'eq', 'unavailable') | selectattr('domain', '==', 'sensor') | selectattr('attributes.device_class', '==', 'battery') %} 
+        {% if state.state == 'unavailable' and not state.entity_id in result.excludedEntities and (not device_id(state.entity_id) or not device_attr(device_id(state.entity_id), 'disabled_by')) %}
+          {% set result.includedEntities = result.includedEntities + [state.name] %}
+        {% endif %}
+    {% endfor %}
+
+    {{"⤵ \n- "}}{{result.includedEntities|join('\n- ')}}
 
 # Triggers
 trigger:

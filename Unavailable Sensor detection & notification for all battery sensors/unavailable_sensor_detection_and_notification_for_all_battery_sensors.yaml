@@ -1,6 +1,6 @@
 blueprint:
-  name: Unavailable entity detection & notification
-  description: Regularly test all entities' status to check for unavailability.
+  name: Unavailable Sensor detection & notification for all battery sensors
+  description: Regularly test battery sensor entities' status to check for unavailability.
   domain: automation
   source_url: https://github.com/andremain/Home-Assistant-Repo/blob/main/Unavailable%20Sensor%20detection%20%26%20notification%20for%20all%20battery%20sensors/unavailable_sensor_detection_and_notification_for_all_battery_sensors.yaml
 
@@ -96,7 +96,7 @@ variables:
       {% endfor %}
     {% endif %}
 
-    {% for state in states | selectattr('state', 'eq', 'unavailable') %}
+    {% for state in states | selectattr('state', 'eq', 'unavailable') | selectattr('domain', '==', 'sensor') | selectattr('attributes.device_class', '==', 'battery') %} 
         {% if state.state == 'unavailable' and not state.entity_id in result.excludedEntities and (not device_id(state.entity_id) or not device_attr(device_id(state.entity_id), 'disabled_by')) %}
           {% set result.includedEntities = result.includedEntities + [state.name] %}
         {% endif %}

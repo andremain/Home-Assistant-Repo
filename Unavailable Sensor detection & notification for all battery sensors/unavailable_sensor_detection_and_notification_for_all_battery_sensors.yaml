@@ -2,7 +2,7 @@ blueprint:
   name: Unavailable entity detection & notification
   description: Regularly test all entities' status to check for unavailability.
   domain: automation
-  source_url: https://github.com/gmlupatelli/blueprints_repo/blob/master/unavailable_entities_notification/unavailable_entities_notification.yaml
+  source_url: https://github.com/andremain/Home-Assistant-Repo/blob/main/Unavailable%20Sensor%20detection%20%26%20notification%20for%20all%20battery%20sensors/unavailable_sensor_detection_and_notification_for_all_battery_sensors.yaml
 
   # Blueprint Inputs
   input:
